@@ -1,0 +1,100 @@
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+    }
+
+    dependencies {
+        /* cambio de 2.0.49 a 2.3.12*/
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.12")
+        /*adicion para reporte de una pagina */
+        classpath("net.serenity-bdd:serenity-single-page-report:2.3.12")
+        /*adicion para reporte de una pagina */
+        //classpath("gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.8")
+    }
+
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'net.serenity-bdd.aggregator'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+ext{
+    /* cambio de version 2.2.8 a 2.3.12*/
+    serenity_version = "2.3.12"
+    /* cambio de version cucumber5 2.2.5 a cucumber6 2.3.12*/
+    serenity_cucumber6_version = "2.3.12"
+    /* cambio de version 5.7.0 a 6.9.1*/
+    cucumber_version = "6.9.1"
+    /* nueva dependencia para logger*/
+    logback_version = "1.2.3"
+    /* cambio de version 1.7.0 a 3.19.0*/
+    assertj_version = "3.19.0"
+    /* cambio de version 1.18.10  a 1.18.18*/
+    lombok_version ="1.18.18"
+    /* cambio de version 1.7.7  a 1.7.30*/
+    slf4j_version="1.7.30"
+    /* cambio de version junit:junit 4.12 a junit:jupiter 5.7.1*/
+    junit_version ="5.7.1"
+
+}
+dependencies {
+    compile localGroovy()
+    compile "net.serenity-bdd:serenity-core:$serenity_version"
+    compile "net.serenity-bdd:serenity-junit:$serenity_version"
+    compile "io.cucumber:cucumber-java:$cucumber_version"
+    compile "io.cucumber:cucumber-junit:$cucumber_version"
+    /*adicion de cucumber-core*/
+    compile "io.cucumber:cucumber-core:$cucumber_version"
+    compile "net.serenity-bdd:serenity-screenplay:$serenity_version"
+    compile "net.serenity-bdd:serenity-screenplay-webdriver:$serenity_version"
+    /*adicion de serenity-ensure para asserts*/
+    compile "net.serenity-bdd:serenity-ensure:$serenity_version"
+    /*se cambia se serenity-cucumber5 a serenity-cucumber6*/
+    compile "net.serenity-bdd:serenity-cucumber6:$serenity_cucumber6_version"
+    compile "net.serenity-bdd:serenity-junit:$serenity_version"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
+    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0'
+    testCompile "org.slf4j:slf4j-api:$slf4j_version"
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junit_version"
+    testCompile "org.assertj:assertj-core:$assertj_version"
+    /* se adiciona el uso de logger*/
+    compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "ch.qos.logback:logback-core:$logback_version"
+    /* Lombok */
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+
+}
+test {
+
+    testLogging {
+        showStandardStreams = true
+    }
+    testLogging.showStandardStreams = true
+    gradle.startParameter.continueOnFailure = true
+    /* Pass all system properties: */
+    systemProperties System.getProperties()
+    test.finalizedBy(aggregate)
+//    verifyGoogleJavaFormat.dependsOn (tasks.googleJavaFormat)
+}
+serenity{
+    reports=["single-page-html"]
+}
+compileJava {options.encoding = "UTF-8"}
+compileTestJava {options.encoding = "UTF-8"}
